@@ -1,0 +1,72 @@
+table dim_consultores
+	lineageTag: e4025bd9-a35d-4cc8-9362-6c50181e7a2c
+
+	column Consultor
+		dataType: string
+		lineageTag: 63251409-ec16-4ef2-a3d1-362de7e692cc
+		summarizeBy: none
+		sourceColumn: Consultor
+
+		annotation SummarizationSetBy = Automatic
+
+	column E-mail
+		dataType: string
+		lineageTag: dec70aca-a9d1-4d95-bb6f-791f1ee8546c
+		summarizeBy: none
+		sourceColumn: E-mail
+
+		annotation SummarizationSetBy = Automatic
+
+	column Usuario
+		dataType: string
+		lineageTag: 679980c6-d98e-4428-bb50-6ce726dc089b
+		summarizeBy: none
+		sourceColumn: Usuario
+
+		annotation SummarizationSetBy = Automatic
+
+	column Carteira
+		dataType: string
+		lineageTag: 6462176e-f46f-461c-8ce8-03f1d4acf89c
+		summarizeBy: none
+		sourceColumn: Carteira
+
+		annotation SummarizationSetBy = Automatic
+
+	column Supervisor
+		dataType: string
+		lineageTag: 44632139-acab-4ebb-9c21-ca720539fe7f
+		summarizeBy: none
+		sourceColumn: Supervisor
+
+		annotation SummarizationSetBy = Automatic
+
+	column Coordenador
+		dataType: string
+		lineageTag: 15742606-4698-4357-b0cf-75b7cbf244ec
+		summarizeBy: none
+		sourceColumn: Coordenador
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_consultores = m
+		mode: import
+		source =
+				let
+				    Fonte = Excel.Workbook(Web.Contents("https://edenred-my.sharepoint.com/personal/lucas_malessa_edenred_com/Documents/Power BI - Produtividade Aprovação\dim_carteiras.xlsx"), null, true),
+				    Consultores_Sheet = Fonte{[Item="Consultores",Kind="Sheet"]}[Data],
+				    #"Cabeçalhos Promovidos" = Table.PromoteHeaders(Consultores_Sheet, [PromoteAllScalars=true]),
+				    #"Texto Aparado" = Table.TransformColumns(#"Cabeçalhos Promovidos",{{"Supervisor", Text.Trim, type text}, {"Coordenador", Text.Trim, type text}, {"E-mail", Text.Trim, type text}}),
+				    #"Texto Limpo" = Table.TransformColumns(#"Texto Aparado",{{"Supervisor", Text.Clean, type text}, {"Coordenador", Text.Clean, type text}, {"E-mail", Text.Clean, type text}}),
+				    #"Linhas Filtradas" = Table.SelectRows(#"Texto Limpo", each ([Consultor] <> null)),
+				    #"Duplicatas Removidas" = Table.Distinct(#"Linhas Filtradas", {"Consultor"}),
+				    #"Texto Aparado1" = Table.TransformColumns(#"Duplicatas Removidas",{{"Consultor", Text.Trim, type text}}),
+				    #"Texto Limpo1" = Table.TransformColumns(#"Texto Aparado1",{{"Consultor", Text.Clean, type text}}),
+				    #"Colunas Removidas" = Table.RemoveColumns(#"Texto Limpo1",{"Column7"})
+				in
+				    #"Colunas Removidas"
+
+	annotation PBI_NavigationStepName = Navegação
+
+	annotation PBI_ResultType = Table
+

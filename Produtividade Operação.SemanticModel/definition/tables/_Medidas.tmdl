@@ -5,14 +5,8 @@ table _Medidas
 			
 			CALCULATE(
 			    DISTINCTCOUNT(DimCalendario[ReferenceDate]),
-			    FILTER(
-			        FactAprovacao,
-			        FactAprovacao[data_aprovacao] <> BLANK()
-			    ),
-			    FILTER(
-			        DimCalendario,
-			        DimCalendario[IsWeekDay] = TRUE()
-			    )
+			    FactAprovacao[data_aprovacao] <> BLANK(),
+			    DimCalendario[IsWeekDay] = TRUE()
 			)
 			
 			```
@@ -33,14 +27,8 @@ table _Medidas
 			
 			CALCULATE(
 			    DISTINCTCOUNT(FactAprovacao[_aprovador]),
-			    FILTER(
-			        FactAprovacao,
-			        FactAprovacao[data_aprovacao] <> BLANK()
-			    ),
-			    FILTER(
-			        DimCalendario,
-			        DimCalendario[IsWeekDay] = TRUE()
-			    )
+			    FactAprovacao[data_aprovacao] <> BLANK(),
+			    DimCalendario[IsWeekDay] = TRUE()
 			)
 		formatString: #,0
 		displayFolder: _Aprovacao
@@ -85,26 +73,18 @@ table _Medidas
 
 		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
 
-	measure Reducao = ```
+	measure Reducao =
 			
 			CALCULATE(
-			    (DIVIDE( ([Total Valor Orcado] - [Total Valor Aprovado] ),[Total Valor Orcado])),
-			    FILTER(
-			        FactAprovacao,
-			        (FactAprovacao[StatusTypeDescription] IN {
-			            "Aprovadas E Nao Iniciadas"
-			            ,
-			            "Iniciadas"
-			            ,
-			            "Concluidas E Nao Cobradas"
-			            ,
-			            "Cobradas"
-			            }) &&
-			        (FactAprovacao[OS_Aprovada] = TRUE())
-			        
-			    )
+			    DIVIDE( ([Total Valor Orcado] - [Total Valor Aprovado] ),[Total Valor Orcado]),
+			    FactAprovacao[StatusTypeDescription] IN {
+			        "Aprovadas E Nao Iniciadas",
+			        "Iniciadas",
+			        "Concluidas E Nao Cobradas",
+			        "Cobradas"
+			    },
+			    FactAprovacao[OS_Aprovada] = TRUE()
 			)
-			```
 		formatString: 0.0%;-0.0%;0.0%
 		displayFolder: _Aprovacao
 		lineageTag: 9f9e1e96-a70a-4819-ad26-56267807b9dc
@@ -113,10 +93,7 @@ table _Medidas
 			
 			CALCULATE(
 			    [Total OS Reguladas],
-			    FILTER(
-			        FactAprovacao,
-			        (FactAprovacao[total_int_rev] + FactAprovacao[total_int_cot]) > 0
-			    )
+			    FactAprovacao[total_int_rev] > 0 || FactAprovacao[total_int_cot] > 0
 			)
 		formatString: #,0
 		displayFolder: _Aprovacao
@@ -461,14 +438,8 @@ table _Medidas
 			
 			CALCULATE(
 			    DISTINCTCOUNT(DimCalendario[ReferenceDate]),
-			    FILTER(
-			        DimCalendario,
-			        DimCalendario[IsWeekDay] = FALSE()
-			    ),
-			    FILTER(
-			        FactAprovacao,
-			        FactAprovacao[data_aprovacao] <> BLANK()
-			    )
+			    DimCalendario[IsWeekDay] = FALSE(),
+			    FactAprovacao[data_aprovacao] <> BLANK()
 			)
 			        
 			
@@ -547,10 +518,7 @@ table _Medidas
 			
 			CALCULATE(
 			    [Total OS Reguladas],
-			    FILTER(
-			        FactAprovacao,
-			        FactAprovacao[total_int_rev] > 0
-			    )
+			    FactAprovacao[total_int_rev] > 0
 			)
 		formatString: 0
 		displayFolder: _Aprovacao
@@ -560,10 +528,7 @@ table _Medidas
 			
 			CALCULATE(
 			    [Total OS Reguladas],
-			    FILTER(
-			        FactAprovacao,
-			        FactAprovacao[total_int_cot] > 0
-			    )
+			    FactAprovacao[total_int_cot] > 0
 			)
 		formatString: 0
 		displayFolder: _Aprovacao

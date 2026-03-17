@@ -87,8 +87,6 @@ relationship d681b055-db51-2acb-b1f1-c88816ec763c
 	toColumn: FactAprovacao.OrderServiceCode
 
 relationship 49454561-863f-b0e8-6adb-0cb803f0e941
-	crossFilteringBehavior: bothDirections
-	fromCardinality: one
 	fromColumn: FactAuditoria.'NÚMERO DA ORDEM DE SERVIÇO'
 	toColumn: FactAprovacao.OrderServiceCode
 
@@ -101,4 +99,8 @@ relationship 868f5b62-58fb-497d-b433-d92763fb7aaa
 	joinOnDateBehavior: datePartOnly
 	fromColumn: FactAuditoria.'Data de aprovação'
 	toColumn: LocalDateTable_ef5fe050-75c5-46bc-9d24-cd2b698e4cd0.Date
+
+relationship 0668059c-1af0-7aca-cd54-a5418497b768
+	fromColumn: dim_consultores.Supervisor
+	toColumn: dim_supervisores.Supervisor
 

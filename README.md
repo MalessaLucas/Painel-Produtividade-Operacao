@@ -1,206 +1,129 @@
-# Painel Produtividade Operação
+# 📊 Painel de Produtividade Operação — Edenred
 
-Este repositório contém a solução completa do dashboard **Produtividade Operação** desenvolvido em Power BI, com fonte de dados no Databricks.
+| Corporate Analytics Solution | *Databricks Apps Integration & OneDrive*
 
----
-
-## 1. Objetivo de Negócios
-
-O painel fornece indicadores de produtividade dos aprovadores de ordens de serviço (OS) no processo de manutenção de frotas. Ele calcula quantas OSs são aprovadas por dia, ajustando por tipo de manutenção, valores orçados, interações com parceiros, feriados e regras de SLA.
-
-**Usuários:** coordenadores, supervisores, aprovadores e analistas de operações.
-
-```mermaid
-%%{init: {'theme': 'dark'}}%%
-flowchart LR
-  A[Aprovador recebe OS] --> B{Tipo de manutenção}
-  B -->|Corretiva| C[Calcula peso_os]
-  B -->|Preventiva| C
-  B -->|Sinistro| C
-  C --> D[Aplica fatores de correção]
-  D --> E[Produtividade = peso_os / dia útil]
-  E --> F[Dashboard Power BI]
-```
+Aplicação de *Business Intelligence* focada em analisar e otimizar a performance dos aprovadores de ordens de serviço (OS) no processo de manutenção de frotas da Edenred. O painel fornece visibilidade em tempo real sobre a velocidade de aprovação e garante a manutenção do SLA acordado, combinando grandes volumes de dados operacionais (Lakehouse) com matrizes de parametrização e segurança em planilhas na nuvem (OneDrive).
 
 ---
 
-## 2. Arquitetura
+## 📋 Guia Executivo (Para Stakeholders e Analistas)
 
-| Camada | Tecnologia | Detalhes |
-|--------|-----------|----------|
-| **Dados** | Azure Databricks | Catálogo `hive_metastore`, schemas `gold` e `bronze` |
-| **ETL/Query** | Spark SQL | Query self-contained com CTEs (sem tabela materializada) |
-| **UDF** | Databricks | `dev_charles_barros.fn_calcular_sla_formatado` |
-| **Modelagem** | Power BI (TMDL) | Modelo tabular importado |
-| **Conexão** | Databricks.Query | Host: `adb-7941093640821140.0.azuredatabricks.net` |
-| **Visualização** | Power BI Report | Páginas de visão geral, detalhes e auditoria |
+### O que o Painel faz?
+Este é um **dashboard interativo** que monitora a performance da equipe de operações. Ele calcula quantas OSs são aprovadas por dia pelos consultores e coordenadores, aplicando pesos diferentes baseados no tipo de manutenção, dificuldade, interações necessárias e SLA.
 
-```mermaid
-%%{init: {'theme': 'dark'}}%%
-flowchart TD
-  subgraph Databricks["Azure Databricks"]
-    G[gold.fact_maintenanceservices]
-    H[gold.dim_maintenance*]
-    I[gold.dim_dates]
-    J[bronze.tlbagda..._historico]
-    K[gold.Dim_MaintenanceParameterLogValue]
-  end
-  subgraph PowerBI["Power BI"]
-    L["Azure - Databricks.Query"]
-    M[M Transform Steps]
-    N[Modelo Tabular]
-    O[Dashboard]
-  end
-  G --> L
-  H --> L
-  I --> L
-  J --> L
-  K --> L
-  L --> M
-  M --> N
-  N --> O
-```
+### Funcionalidades Disponíveis
+
+| Funcionalidade | O que faz | Onde encontrar |
+|---|---|---|
+| **Dashboard Principal** | Mostra os indicadores-chave (SLA, Dias Úteis Trabalhados, Produtividade). | Página inicial |
+| **Análise de Aprovadores** | Detalha a média diária de OSs concluídas por consultor e supervisor. | Aba Analítica |
+| **Auditoria e Glosas** | Cruza dados operacionais com indicadores financeiros de glosas. | Aba Auditoria |
+
+### Glossário de Termos
+- **SLA de Aprovação:** Tempo em horas úteis garantido em contrato para a devolução e aceite de uma Manutenção.
+- **Peso OS:** Multiplicador que equipara OSs fáceis e difíceis para avaliar a performance com equidade.
+- **Interação (Revisão/Cotação):** Ações adicionais necessárias pelo analista junto ao parceiro/oficina, que somam "tempos extras" à meta.
+- **Monta (Alta/Baixa/Média):** Classificação de severidade e valor de uma OS aprovada.
+
+### Fluxo de Uso
+1. O analista acessa o painel filtrando sua **Carteira** ou **Supervisor**.
+2. Filtra dinamicamente os **Períodos (Semana/Mês)** para verificação de batimento de meta.
+3. Observa os cards de **Eficiência de SLA** para agir rápido em gargalos.
 
 ---
 
-## 3. Estrutura da Modelagem
+## 💻 Documentação Técnica (Para Engenheiros e Devs)
 
-A tabela principal é **FactAprovacao**, carregada por uma query SQL complexa com múltiplas CTEs. Relacionamentos com dimensões de calendário, aprovadores, supervisores, coordenadores e metas.
-
-```mermaid
-%%{init: {'theme': 'dark'}}%%
-erDiagram
-  FactAprovacao ||--o{ DimCalendario : "data_aprovacao"
-  FactAprovacao ||--o{ dim_aprovadores : "_aprovador"
-  FactAprovacao ||--o{ dim_supervisores : "_aprovador"
-  FactAprovacao ||--o{ dim_coordenadores : "_aprovador"
-  FactAprovacao ||--o{ dim_metas : "CustomerId"
-  FactAprovacao ||--o{ FactAuditoria : "OrderServiceCode"
-  FactAprovacao ||--o{ glosas : "OrderServiceCode"
-```
-
----
-
-## 4. Tabelas Utilizadas
-
-| Tabela | Schema | Descrição |
-|--------|--------|-----------|
-| `fact_maintenanceservices` | gold | OSs e timestamps de aprovação |
-| `fact_maintenanceitems` | gold | Itens para cálculo de aderência |
-| `dim_maintenancevehicles` | gold | Veículos (família, cliente) |
-| `dim_maintenancetypes` | gold | Tipo de manutenção |
-| `dim_webusers` | gold | Usuários aprovadores (4 joins) |
-| `dim_dates` | gold | Calendário com feriados |
-| `dim_Maintenanceprotocols` | gold | Protocolos de manutenção |
-| `dim_maintenancemerchants` | gold | Estabelecimentos (filtro concessionária) |
-| `dim_maintenancelabors` | gold | Tipos de mão de obra |
-| `Dim_MaintenanceParameterLogValue` | gold | Log de parâmetros (preço parceiro) |
-| `tlbagda_fuel_manutencao_oficina_historico` | bronze | Histórico de interações (revisão/cotação) |
-
----
-
-## 5. Medidas DAX Principais
-
-| Medida | Fórmula/Descrição |
-|--------|-------------------|
-| `Tempo Estimado Aprovação` | `7.48 * FactAprovacao[peso_os]` |
-| `Dentro SLA` | `sla_aprovocao <= dim_metas.SLA (h)` (calculada em M) |
-| `produtividade_semana_aprovador` | soma_peso_os / dias_úteis (calculada em SQL) |
-| `peso_os` | `1 / meta_os_dia_corrigido` (calculada em SQL) |
-
-> As demais medidas estão no arquivo `_Medidas.tmdl` do modelo semântico.
+### Documentação Técnica (Fluxograma)
 
 ```mermaid
 %%{init: {'theme': 'dark'}}%%
 flowchart TD
-  A[Tipo Manutencao + Faixa Qtde Itens] --> B[tempo_padrao]
-  C[Interacoes revisao/cotacao] --> D[tempo_extra_interacao]
-  E[Cliente mercado publico] --> F[tempo_extra_mercadopublico]
-  G["Familia modelo + Valor OS"] --> H["_monta / fator_correcao_monta"]
-  I[Preco parceiro] --> J["fator_correcao_precoparceiro 1.0 ou 1.1"]
-  B --> K["meta_os_dia = 7.48h x 60 / tempo_padrao + extras"]
-  D --> K
-  F --> K
-  K --> L["meta_corrigida = meta / fator_monta x fator_preco"]
-  H --> L
-  J --> L
-  L --> M["peso_os = 1 / meta_corrigida"]
-  M --> N["produtividade = soma peso_os / dias_uteis"]
+  subgraph DW["Azure Databricks (Lakehouse)"]
+    A[hive_metastore.gold.fact_maintenanceservices]
+    B[hive_metastore.gold.dim_maintenancetypes]
+    C[hive_metastore.gold.dim_webusers]
+    D[vw_fact_aprovacao (SQL View)]
+  end
+  subgraph OD["OneDrive (SharePoint)"]
+    OD1[dim_carteiras.xlsx]
+  end
+  subgraph PBI["Power BI (TMDL)"]
+    E[Power Query M / Import]
+    F[Star Schema / Modelo de Dados]
+    G[Medidas DAX KEEPFILTERS]
+    H[RLS - Segurança Hierárquica]
+  end
+  A -->|Native Query| D
+  B -->|Native Query| D
+  C -->|Native Query| D
+  D -->|ODBC Connector| E
+  OD1 -->|Web.Contents / Excel| E
+  E --> F
+  F --> G
+  F --> H
 ```
 
----
+### Stack Tecnológico
+- **Cloud/Data Platform:** Azure Databricks (Unity Catalog, Spark SQL).
+- **Apoio de Parametrização:** OneDrive / Excel Sharepoint.
+- **Frontend / BI:** Microsoft Power BI Desktop & Service.
+- **Modelagem:** TMDL (Tabular Model Definition Language).
+- **Linguagens:** SQL, DAX, Power Query (M).
 
-## 6. Código SQL
-
-A query está disponível em dois formatos:
-
-| Arquivo | Descrição |
-|---------|-----------|
-| `FactAprovacao.sql` | Versão original com `CREATE TABLE` no schema `dev_matheus_bertoti` |
-| `FactAprovacao_DirectQuery.sql` | **Versão atual** - query self-contained sem dependência de schema dev |
-
-### Estrutura das CTEs
-
-```mermaid
-%%{init: {'theme': 'dark'}}%%
-flowchart TD
-  subgraph bloco1["Bloco 1: Preco Parceiro"]
-    P1[pi_logs] --> P2[pi_sets]
-    P2 --> P3[pi_adds]
-    P2 --> P4[pi_removes]
-    P3 --> P5[pi_events]
-    P4 --> P5
-    P5 --> P6[pi_ordered]
-    P6 --> P7[param_intervals]
-  end
-  subgraph bloco2["Bloco 2: Query Principal"]
-    Q1[CTE_BASE] --> Q2[CTE_FLAG]
-    P7 --> Q2
-    Q2 --> Q3[CTE_CALC]
-    Q3 --> Q4["CTE2 - dias uteis"]
-    Q3 --> Q5["CTE3 - aderencia"]
-    Q5 --> Q6["CTE4 - totais"]
-    Q3 --> Q7[SELECT FINAL]
-    Q4 --> Q7
-    Q6 --> Q7
-  end
+### Estrutura de Diretórios
+```text
+/Produtividade Operação.SemanticModel
+ ├── /definition
+ │    ├── /tables/ (Arquivos TMDL dimensionais e fatos)
+ │    ├── /roles/ (Filtros de Segurança RLS)
+ │    ├── model.tmdl (Definição principal)
+ │    └── relationships.tmdl (Ligações do Modelo)
+/vw_fact_aprovacao.sql (Script de View DDL para o Databricks)
+/README.md
 ```
 
+### Catálogo de Tabelas
+| Tabela | Origem | Tipo | Descrição |
+|---|---|---|---|
+| `FactAprovacao` | Databricks | Fato | Fato central agregando requisições de OS, timestamps e pesos. (Via SQL View). |
+| `FactAuditoria` | Databricks | Fato | Fato de compliance das notas de atendimento e serviço. |
+| `DimCalendario` | DAX | Dimensão | Tabela de dDates com mapeamento dinâmico de Feriados e Finais de Semana. |
+| `dim_consultores` | OneDrive | Dimensão | Parametrização importada do Excel: Mapeamento 1:1 de consultores e chaves de e-mail (Vital para Segurança RLS). |
+| `dim_supervisores` | OneDrive | Dimensão | Parametrização importada do Excel: Tabela de rollup hierárquico da gestão operacional (Carteiras e Coordenadores). |
+| `dim_metas` | OneDrive | Dimensão | Alvos de SLA e métricas-chave por clientes. |
+
+### Colunas Críticas e Importância do OneDrive
+Apesar dos dados transacionais massivos residirem no Databricks, **as planilhas do OneDrive ditam ativamente as regras de negócio organizacionais**. 
+- **A Influência do Excel:** A tabela `dim_carteiras.xlsx` fornece os e-mails para identificação corporativa do `USERNAME()` nas funções DAX. Sem isto, a segurança de nível de linha em cascata (RLS) colapsa, exibindo dados de gestores divergentes ou bloqueando totalmente o painel para um usuário válido. Além disso, as metas de SLA na pasta `dim_metas` afetam crucialmente todas as `Measures` que calculam se a OS foi tempestiva de fato ou não.
+- `FactAprovacao[peso_os]`: Coluna essencial (SQL Nativo), serve de multiplicador da produtividade.
+- `FactAprovacao[data_aprovacao]`: Data base convertida para `DATE` removendo horários e aprimorando compressão VertiPaq.
+
+### Regras de Negócios
+* O painel foca na taxa de eficiência em **Dias Úteis**. Dias de fim de semana são contados ou pulados dinamicamente via filtros de dias trabalhados (`Sábado = Sim/Não`) mapeados na planilha da estrutura do OneDrive (Aprovadores).
+* OSs "Automáticas" (`IsAutomaticApproval = TRUE`) são sumariamente excluídas para não inflar a produtividade real humana.
+* **Preço Parceiro:** Lojas não-concessionárias recebem fator de correção positivo ou negativo na performance.
+
+### Gráficos e Visualizações
+* Gráficos de barra empilhada detalhando `Ticket Médio x Total Valor Aprovado`.
+* Matrizes de `Aderência` usando _Conditional Formatting_ com base no range SLA vs Executado.
+
+### Fluxo de Sincronização de Dados
+1. Origem Primária: Datalake (`hive_metastore.bronze` -> `gold`) atualizado via Databricks Workflows.
+2. Origem Secundária: Arquivos do Excel (OneDrive) atualizados ativamente pela operação de Gestão de Frota.
+3. Ingestão: Power BI Service através de Agendamento (Scheduled Refresh - Diário).
+
+### ⚠️ Notas Adicionais e Arquitetura de Sustentação Recomendada
+* **Alerta de Governança (Data Mesh):** Trabalhar com dados parametrizadores estruturais (Segurança de Hierarquia Corporativa, Metas Regionais e Regras Trabalhistas como Dias de Sábado) vinculados em planilhas *.xlsx* descentralizadas no OneDrive sob custódia humana (`dim_carteiras.xlsx`) **não é a prática recomendada de arquitetura para a sustentação analítica de longo prazo**. 
+* **Riscos Latentes:** Planilhas hospedadas sobem imensamente a taxa de quebra de atualização automatizada do BI (Scheduled Refreshes), por serem fontes extremamente suscetíveis a manipulações e instabilidades, tais como exclusão acidental, colunas renomeadas, conversão errada de tipagem e locks de edição concorrente por membros da operação.
+* **O Modelo Lakehouse Ideal:** O estágio técnico maduro para este painel é **migrar e centralizar** a matriz de hierarquia da equipe, metas por carteira e regras do RLS para dentro do **LAKEHOUSE (Databricks)** como tabelas dimensionais controladas (View/Silver Area). Isso extirpa a dependência do SharePoint, garante integridade relacional via metadados rastreáveis _end-to-end_ e permite consolidar o *Query Folding* com um conector Cloud limpo. Com isso, o arquivo `Produtividade Operação` passaria a servir puramente como a *Camada Semântica*, sem ter que aplicar lógicas custosas unindo sistemas distantes via M (Power Query).
+
+### Segurança e Governança
+Este modelo utiliza **RLS Dinâmico (Row-Level Security) em Cascata**:
+* `[Role: Administradores]`: Visualização total de carteiras.
+* `[Role: Supervisores]`: Tabela `dim_supervisores` filtra automaticamente e propaga a leitura somente para `Consultores` e suas `Aprovações` atreladas ao seu e-mail do sistema.
+* Nível de confidencialidade dos Dados: **Organizacional (Sensível)**. Requer conector unificado Databricks x Entra ID.
+
 ---
-
-## 7. Modificações Recentes
-
-| Data | Modificação |
-|------|-------------|
-| 2026-02-19 | Eliminado schema `dev_matheus_bertoti` e tabela materializada |
-| 2026-02-19 | Criada query self-contained `FactAprovacao_DirectQuery.sql` |
-| 2026-02-19 | Atualizada partition source no TMDL para usar query direta |
-| 2026-02-19 | Versionamento inicial no GitHub |
-
-```mermaid
-%%{init: {'theme': 'dark'}}%%
-flowchart LR
-  subgraph antes["Antes"]
-    A1["Databricks: CREATE TABLE dev_matheus_bertoti.produtividadeoperacao"]
-    A2["Power BI: SELECT * FROM dev_matheus_bertoti..."]
-    A1 --> A2
-  end
-  subgraph depois["Depois"]
-    B1["Power BI: WITH ... SELECT query completa inline"]
-    B2["Databricks executa sob demanda"]
-    B1 --> B2
-  end
-  antes -.->|migracao| depois
-```
-
----
-
-## 8. Notas Adicionais
-
-- O painel **não retorna valores em feriados** ou dias não úteis por design (filtro `dd.HolidayOrBridge`).
-- Aprovadores do sábado seguem regra diferente (`WeekDayNumber <= 5` vs `<= 4`).
-- Caso o UDF `dev_charles_barros.fn_calcular_sla_formatado` seja removido, será necessário replicar sua lógica inline.
-
----
-
-> **Repositório:** [EntregaResultados/Painel-Produtividade-Operacao](https://github.com/EntregaResultados/Painel-Produtividade-Operacao)
+© 2025–2026 Edenred — Todos os direitos reservados.
+Desenvolvido pela equipe de Entrega de Resultados — Dados.

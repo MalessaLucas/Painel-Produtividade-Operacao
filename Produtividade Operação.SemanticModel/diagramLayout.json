@@ -4,14 +4,14 @@
     {
       "ordinal": 0,
       "scrollPosition": {
-        "x": 106.32230737503316,
-        "y": 126.57417544646806
+        "x": 706.66668701171864,
+        "y": 410.66665649414051
       },
       "nodes": [
         {
           "location": {
             "x": 2623.0341996246489,
-            "y": 417.54628741306141
+            "y": 421.14935517051362
           },
           "nodeIndex": "_Medidas",
           "nodeLineageTag": "8cf96042-2fcd-4972-af59-a5456ffc7231",
@@ -24,7 +24,7 @@
         {
           "location": {
             "x": 644.944606417708,
-            "y": 344.95049361535905
+            "y": 348.55356137281126
           },
           "nodeIndex": "FactAprovacao",
           "nodeLineageTag": "9400547a-0c9b-4a52-9697-4756e9620a48",
@@ -38,7 +38,7 @@
         {
           "location": {
             "x": 144.26405140706913,
-            "y": 7.2061355149043891
+            "y": 10.809203272356598
           },
           "nodeIndex": "DimCalendario",
           "nodeLineageTag": "8c4dacc2-a4f7-45fb-a73e-3f25b4e1a667",
@@ -51,7 +51,7 @@
         {
           "location": {
             "x": 767.47625322618478,
-            "y": 769.7578996014488
+            "y": 773.360967358901
           },
           "nodeIndex": "FactAuditoria",
           "nodeLineageTag": "7bdc053f-e747-404d-91c2-1891799c2982",
@@ -64,7 +64,7 @@
         {
           "location": {
             "x": 2287.2422893482671,
-            "y": 250.56278954127504
+            "y": 254.16585729872725
           },
           "nodeIndex": "ListaAprovadoresSabado",
           "nodeLineageTag": "260d4a35-94ac-420b-b20c-39072fd8823f",
@@ -77,7 +77,7 @@
         {
           "location": {
             "x": 2602.6810094347506,
-            "y": 255.05403526791554
+            "y": 258.65710302536775
           },
           "nodeIndex": "ListaCodigoClientes",
           "nodeLineageTag": "36086bf4-27f9-4c19-9f70-d352ab05f9fa",
@@ -90,7 +90,7 @@
         {
           "location": {
             "x": 1076.4168008615861,
-            "y": 71.458787126805461
+            "y": 75.06185488425767
           },
           "nodeIndex": "TabelaProdutividade",
           "nodeLineageTag": "480bd379-9a12-4cba-8701-3df06385a3e3",
@@ -103,7 +103,7 @@
         {
           "location": {
             "x": 2017.6249613298232,
-            "y": 16.947977569095428
+            "y": 20.551045326547637
           },
           "nodeIndex": "Parâmetro Gráfico Produtividade",
           "nodeLineageTag": "1e70c813-fbae-4b30-a769-602e64f74fe2",
@@ -116,7 +116,7 @@
         {
           "location": {
             "x": 2324.0811899630266,
-            "y": 19.965486115814542
+            "y": 23.568553873266751
           },
           "nodeIndex": "Parâmetro Mensal / Semanal",
           "nodeLineageTag": "e2af26db-80aa-4695-a08c-d4650cac3336",
@@ -129,7 +129,7 @@
         {
           "location": {
             "x": 1033.3570710472763,
-            "y": 391.36549256646867
+            "y": 394.96856032392088
           },
           "nodeIndex": "dim_aprovadores",
           "nodeLineageTag": "cfdaf843-5b40-4f63-a296-c951a6343fba",
@@ -141,8 +141,8 @@
         },
         {
           "location": {
-            "x": 1728.8210778085036,
-            "y": 405.24473381645282
+            "x": 1447.189124690683,
+            "y": 804.30146147665641
           },
           "nodeIndex": "dim_coordenadores",
           "nodeLineageTag": "f06c1445-2322-4c0e-8d9b-aad06526336e",
@@ -155,7 +155,7 @@
         {
           "location": {
             "x": 1380.4545422861493,
-            "y": 379.17104742849415
+            "y": 382.77411518594636
           },
           "nodeIndex": "dim_supervisores",
           "nodeLineageTag": "0f9259ca-1107-401e-97b2-94aaa14e34e4",
@@ -168,7 +168,7 @@
         {
           "location": {
             "x": 2632.7830414595492,
-            "y": 38.702354705775178
+            "y": 42.305422463227387
           },
           "nodeIndex": "dim_metas",
           "nodeLineageTag": "22a93edb-7fbd-4216-be18-c3d9f6084c1c",
@@ -181,7 +181,7 @@
         {
           "location": {
             "x": 329.48908222369437,
-            "y": 587.3953268837621
+            "y": 590.9983946412143
           },
           "nodeIndex": "glosas",
           "nodeLineageTag": "6b22914e-50a9-45e3-9ac0-c94e7ad8bee7",
@@ -190,10 +190,23 @@
             "width": 234
           },
           "zIndex": 1
+        },
+        {
+          "location": {
+            "x": 1102.933385672497,
+            "y": 817.33353969929669
+          },
+          "nodeIndex": "dim_consultores",
+          "nodeLineageTag": "e4025bd9-a35d-4cc8-9362-6c50181e7a2c",
+          "size": {
+            "height": 224,
+            "width": 234
+          },
+          "zIndex": 15
         }
       ],
       "name": "Todas as tabelas",
-      "zoomValue": 79.005057427605323,
+      "zoomValue": 50.000000000000014,
       "pinKeyFieldsToTop": false,
       "showExtraHeaderInfo": false,
       "hideKeyFieldsWhenCollapsed": false,

@@ -14,7 +14,7 @@ queryGroup Filtros
 
 	annotation PBI_QueryGroupOrder = 1
 
-annotation PBI_QueryOrder = ["FactAprovacao","_Medidas","DimCalendario","ClusterDB","HostDB","Azure","FiltroData","FactAuditoria","ListaCodigoClientes","ListaAprovadoresSabado","dim_aprovadores","dim_supervisores","dim_coordenadores","dim_metas","glosas"]
+annotation PBI_QueryOrder = ["FactAprovacao","_Medidas","DimCalendario","ClusterDB","HostDB","Azure","FiltroData","FactAuditoria","ListaCodigoClientes","ListaAprovadoresSabado","dim_aprovadores","dim_supervisores","dim_coordenadores","dim_metas","glosas","dim_consultores"]
 
 annotation __PBI_TimeIntelligenceEnabled = 1
 
@@ -49,11 +49,13 @@ ref table LocalDateTable_71358638-64c6-4258-a771-2b3347a58fe7
 ref table LocalDateTable_a289d439-2d73-4703-bac0-a73d60342fca
 ref table LocalDateTable_e3115d90-6e9a-4e93-ac54-9155d5e1d7ef
 ref table LocalDateTable_ef5fe050-75c5-46bc-9d24-cd2b698e4cd0
+ref table dim_consultores
 
 ref role Admin
 ref role Aprovadores
 ref role Coordenadores
 ref role Supervisores
+ref role Consultores
 
 ref cultureInfo pt-BR
 

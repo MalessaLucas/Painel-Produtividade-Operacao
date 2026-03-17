@@ -1,0 +1,7 @@
+role Consultores
+	modelPermission: read
+
+	tablePermission dim_consultores = dim_consultores[E-mail] == USERNAME()
+
+	annotation PBI_Id = 1a8157100bc3477cb0593eb9110852eb
+
