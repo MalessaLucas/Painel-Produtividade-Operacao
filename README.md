@@ -40,19 +40,19 @@ Este é um **dashboard interativo** que monitora a performance da equipe de oper
 %%{init: {'theme': 'dark'}}%%
 flowchart TD
   subgraph DW["Azure Databricks (Lakehouse)"]
-    A[hive_metastore.gold.fact_maintenanceservices]
-    B[hive_metastore.gold.dim_maintenancetypes]
-    C[hive_metastore.gold.dim_webusers]
-    D[vw_fact_aprovacao (SQL View)]
+    A["hive_metastore.gold.fact_maintenanceservices"]
+    B["hive_metastore.gold.dim_maintenancetypes"]
+    C["hive_metastore.gold.dim_webusers"]
+    D["vw_fact_aprovacao (SQL View)"]
   end
   subgraph OD["OneDrive (SharePoint)"]
-    OD1[dim_carteiras.xlsx]
+    OD1["dim_carteiras.xlsx"]
   end
   subgraph PBI["Power BI (TMDL)"]
-    E[Power Query M / Import]
-    F[Star Schema / Modelo de Dados]
-    G[Medidas DAX KEEPFILTERS]
-    H[RLS - Segurança Hierárquica]
+    E["Power Query M / Import"]
+    F["Star Schema / Modelo de Dados"]
+    G["Medidas DAX KEEPFILTERS"]
+    H["RLS - Segurança Hierárquica"]
   end
   A -->|Native Query| D
   B -->|Native Query| D
